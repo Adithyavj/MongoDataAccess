@@ -75,4 +75,42 @@ public class ChoreDataAccess
         var choreCollection = ConnectToMongo<ChoreModel>(ChoreCollection);
         return choreCollection.DeleteOneAsync(c => c.Id == chore.Id);
     }
+
+    public async Task CompleteChore(ChoreModel chore)
+    {
+        // Non Transactional
+        //// updated chore to update new time
+        //var choreCollection = ConnectToMongo<ChoreModel>(ChoreCollection);
+        //var filter = Builders<ChoreModel>.Filter.Eq("Id",chore.Id);
+        //await choreCollection.ReplaceOneAsync(filter, chore);
+
+        //// add to chorehistory
+        //var choreHistoryCollection = ConnectToMongo<ChoreHistoryModel>(ChoreHistoryCollection);
+        //await choreHistoryCollection.InsertOneAsync(new ChoreHistoryModel(chore));
+
+        // Using transactions [Need MongoDB Atlas for this]
+        var client = new MongoClient(ConnectionString);
+        using var session = await client.StartSessionAsync();
+
+        session.StartTransaction();
+
+        try 
+        {
+            var db = client.GetDatabase(DatabaseName);
+            var choreCollection = db.GetCollection<ChoreModel>(ChoreCollection);
+            var filter = Builders<ChoreModel>.Filter.Eq("Id", chore.Id);
+            await choreCollection.ReplaceOneAsync(filter, chore);
+
+            var choreHistoryCollection = db.GetCollection<ChoreHistoryModel>(ChoreHistoryCollection);
+            await choreHistoryCollection.InsertOneAsync(new ChoreHistoryModel(chore));
+
+            await session.CommitTransactionAsync();
+        }
+        catch (Exception ex) 
+        {
+            await session.AbortTransactionAsync();
+            Console.WriteLine(ex.Message);
+        }
+
+    }
 }
