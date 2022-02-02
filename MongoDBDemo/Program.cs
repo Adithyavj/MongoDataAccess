@@ -21,24 +21,24 @@ namespace MongoDBDemo
             //    }
             //};
             //db.InsertRecord("Users", person);
-            //var recs = db.LoadRecord<PersonModel>("Users");
-
-            //foreach (var rec in recs)
-            //{
-            //    Console.WriteLine($"{ rec.Id}: {rec.FirstName} {rec.LastName}");
-
-            //    if (rec.PrimaryAddress != null)
-            //    {
-            //        Console.WriteLine(rec.PrimaryAddress.City);
-            //    }
-            //}
-
-            var recs = db.LoadRecord<NameModel>("Users");
+            var recs = db.LoadRecord<PersonModel>("Users");
 
             foreach (var rec in recs)
             {
-                Console.WriteLine($"{rec.FirstName} {rec.LastName}");
+                Console.WriteLine($"{ rec.Id}: {rec.FirstName} {rec.LastName}");
+
+                if (rec.PrimaryAddress != null)
+                {
+                    Console.WriteLine(rec.PrimaryAddress.City);
+                }
             }
+
+            //var recs = db.LoadRecord<NameModel>("Users");
+
+            //foreach (var rec in recs)
+            //{
+            //    Console.WriteLine($"{rec.FirstName} {rec.LastName}");
+            //}
 
             //var oneRec = db.LoadRecordById<PersonModel>("Users", new Guid("c9ae7069-e11c-4d2b-b980-bd0e0c643616"));
 
