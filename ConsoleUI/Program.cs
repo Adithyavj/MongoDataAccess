@@ -38,3 +38,10 @@ var chore = new ChoreModel
 };
 
 await db.CreateChore(chore);
+
+var chores = await db.GetAllChores();
+
+var newChore = chores.First();
+newChore.LastCompleted = DateTime.UtcNow;
+
+await db.CompleteChore(newChore);
